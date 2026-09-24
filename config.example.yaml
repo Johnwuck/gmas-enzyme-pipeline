@@ -1,0 +1,78 @@
+# 关键词驱动的酶搜索 + DLKcat 流水线（远程部署模板）
+# 复制为 config.yaml 后按需修改
+
+keyword: gmas
+query: ""
+
+paths:
+  data_root: data
+  results_root: results
+  substrates: data/substrates
+  # Docker 默认挂载 NCBI 根到 /db/ncbi；裸机请改为宿主机绝对路径
+  blastdb: /db/ncbi/diamond/nr
+
+substrates:
+  - name: L-glutamate
+    smiles: "C(CC(=O)O)C(C(=O)O)N"
+    cid: 33032
+  - name: ethylamine
+    smiles: "CCN"
+    cid: 6341
+
+uniprot:
+  page_size: 500
+  timeout_sec: 60
+  max_retries: 5
+
+blast:
+  # diamond（推荐搜 NR）或 blastp（Swiss-Prot / 小库）
+  engine: diamond
+  program: blastp
+  # DIAMOND NR：先 docker compose --profile setup run --rm build_diamond_nr
+  # blastp Swiss-Prot：/db/ncbi/blastdb/swissprot + engine: blastp
+  database: /db/ncbi/diamond/nr
+  evalue: 1.0e-5
+  max_target_seqs: 100
+  # local：需已有 .dmnd 或 BLAST 库
+  mode: local
+  hitlist_size: 50
+  max_concurrent: 1
+  sleep_sec: 3
+  # 0=按 CPU/负载自动（上限 48）；本机可写 32–48
+  num_threads: 0
+  # 仅 blastp：1=按 query 并行；2=按库切片；0=BLAST 自动
+  mt_mode: 1
+  diamond_sensitivity: ""
+
+alphafold:
+  versions: ["v4", "v6", "v3", "v2"]
+  timeout_sec: 45
+  workers: 16
+  uniprot_only: true
+
+foldseek:
+  sensitivity: 7.5
+  evalue: 0.001
+  mode: all_vs_all
+  threads: 0
+  # auto | foldseek | diamond（diamond 用本地 Swiss-Prot，无需下 Foldseek-AFDB）
+  # diamond（序列→Swiss-Prot→AFDB，推荐）| foldseek（仅结构 query）| auto→diamond
+  afdb_backend: diamond
+  # 全量 UniProt AFDB：解压 afdb.tar.gz 后前缀 /db/ncbi/foldseek/afdb
+  afdb_database: /db/ncbi/foldseek/afdb
+  afdb_diamond_db: /db/ncbi/foldseek/swissprot
+  afdb_max_seqs: 5
+  afdb_download_structures: true
+
+dedupe:
+  identity: 0.9
+  word_size: 5
+  threads: 0
+
+dlkcat:
+  root: third_party/DLKcat/DeeplearningApproach
+  python: python
+  max_enzymes: 0
+
+pipeline:
+  force: false

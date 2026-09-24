@@ -1,0 +1,63 @@
+services:
+  pipeline:
+    build: .
+    image: gmas-pipeline:latest
+    working_dir: /app
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./config.yaml:/app/config.yaml:ro
+      - ./scripts:/app/scripts:ro
+      - ./src:/app/src:ro
+      # 共享 NCBI BLAST / DIAMOND 库（宿主机 /mnt/sdb/tmp/Databases/NCBI）
+      - ${NCBI_DB_ROOT:-/mnt/sdb/tmp/Databases/NCBI}:/db/ncbi:ro
+      # 若宿主机已 vendor DLKcat，可取消下一行注释以复用（避免重建时重复 clone）
+      # - ./third_party:/app/third_party
+    environment:
+      - PIPELINE_ROOT=/app
+      - NCBI_DB_ROOT=/db/ncbi
+    # 示例: docker compose run --rm pipeline --keyword gmas --step all
+
+  download_blastdb:
+    image: gmas-pipeline:latest
+    working_dir: /app
+    volumes:
+      - ${NCBI_DB_ROOT:-/mnt/sdb/tmp/Databases/NCBI}/blastdb:/db/ncbi/blastdb
+      - ./scripts:/app/scripts:ro
+    environment:
+      - BLASTDB_DIR=/db/ncbi/blastdb
+    entrypoint: ["bash", "/app/scripts/download_blastdb.sh"]
+    profiles: ["setup"]
+
+  # 构建 DIAMOND NR（读写 diamond/，只读挂载 BLAST NR 供 blastdbcmd 导出）
+  build_diamond_nr:
+    image: gmas-pipeline:latest
+    working_dir: /app
+    volumes:
+      - ${NCBI_DB_ROOT:-/mnt/sdb/tmp/Databases/NCBI}/NR:/db/ncbi/NR:ro
+      - ${NCBI_DB_ROOT:-/mnt/sdb/tmp/Databases/NCBI}/diamond:/db/ncbi/diamond
+      - ./scripts:/app/scripts:ro
+    environment:
+      - NCBI_DB_ROOT=/db/ncbi
+      - DIAMOND_DB_DIR=/db/ncbi/diamond
+      - BLAST_NR_DB=/db/ncbi/NR/nr
+      - DIAMOND_THREADS=48
+    entrypoint: ["bash", "/app/scripts/build_diamond_nr.sh"]
+    profiles: ["setup"]
+
+  # 下载 Foldseek 格式 AlphaFold DB（序列搜 AFDB）
+  download_foldseek_afdb:
+    image: gmas-pipeline:latest
+    working_dir: /app
+    volumes:
+      - ${NCBI_DB_ROOT:-/mnt/sdb/tmp/Databases/NCBI}/foldseek:/db/ncbi/foldseek
+      - ./scripts:/app/scripts:ro
+    environment:
+      - NCBI_DB_ROOT=/db/ncbi
+      - FOLDSEEK_AFDB_DIR=/db/ncbi/foldseek
+      # Alphafold/Swiss-Prot（默认，~1.5G）| Alphafold/UniProt50（~114G）| Alphafold/Proteome
+      - FOLDSEEK_AFDB_NAME=${FOLDSEEK_AFDB_NAME:-Alphafold/Swiss-Prot}
+      - FOLDSEEK_AFDB_MIRROR=${FOLDSEEK_AFDB_MIRROR:-https://opendata.mmseqs.org/foldseek}
+      - FOLDSEEK_THREADS=48
+    entrypoint: ["bash", "/app/scripts/download_foldseek_afdb.sh"]
+    profiles: ["setup"]

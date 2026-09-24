@@ -1,0 +1,17 @@
+.git
+.gitignore
+**/__pycache__
+**/*.pyc
+**/*.pyo
+.pytest_cache
+.mypy_cache
+.cursor
+results/
+data/structures/
+data/*/structures/
+data/*/raw/
+# BLAST 库与大体量结果不进镜像（运行时挂载/下载）
+data/blastdb/
+*.log
+agent-transcripts/
+# 保留 third_party/DLKcat（本机已 vendor）；勿排除，否则构建阶段会 git clone GitHub 且易超时

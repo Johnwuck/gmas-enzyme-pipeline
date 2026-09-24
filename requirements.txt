@@ -1,0 +1,7 @@
+# pip 兜底（推荐优先使用 environment.yml / Docker）
+requests>=2.31.0
+biopython>=1.83
+pandas>=2.0.0
+PyYAML>=6.0
+# DLKcat 还需: torch, rdkit, scikit-learn
+# 生物信息二进制请用 conda: blast, cd-hit, foldseek

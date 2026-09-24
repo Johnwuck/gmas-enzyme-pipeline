@@ -1,0 +1,6 @@
+{
+  "name": "Fumonisin B3",
+  "smiles": "CCCC[C@@H](C)[C@H]([C@H](C[C@@H](C)C[C@@H](CCCCCC[C@@H]([C@H](C)N)O)O)OC(=O)C[C@@H](CC(=O)O)C(=O)O)OC(=O)C[C@@H](CC(=O)O)C(=O)O",
+  "cid": 42608358,
+  "source": "config"
+}

@@ -1,0 +1,29 @@
+# 本地运行配置（含机器线程数等；请从 config.example.yaml 复制）
+config.yaml
+
+# 本地/运行产物（体积大，不入库）
+results/
+logs/
+data/*/structures/
+data/*/raw/
+data/blastdb/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+.venv/
+venv/
+
+# 编辑器 / 系统
+.DS_Store
+.idea/
+.vscode/
+.cursor/
+
+# vendored DLKcat（由 scripts/vendor_dlkcat.sh 拉取，约 300MB+）
+third_party/DLKcat/

@@ -1,0 +1,14 @@
+本目录为可远程部署的整合包。
+
+快速开始见 README.md、docs/DEPLOY.md、docs/USAGE.md。
+
+不含（部署时另行准备）:
+  - Swiss-Prot / DIAMOND NR / Foldseek-AFDB（见 scripts/ 与 docs/DEPLOY.md）
+  - 历史运行结果 results/、大体量 AFDB 结构
+  - third_party/DLKcat（运行 bash scripts/vendor_dlkcat.sh）
+  - 本地 config.yaml（请 cp config.example.yaml config.yaml）
+
+含:
+  - 流水线源码与 Docker/Conda 配置
+  - data/substrates/（底物缓存示例）
+  - 文档与配置模板

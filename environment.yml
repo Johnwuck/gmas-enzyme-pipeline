@@ -1,0 +1,22 @@
+name: gmas_pipeline
+channels:
+  - pytorch
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - requests>=2.31
+  - biopython>=1.83
+  - pandas>=2.0
+  - pyyaml>=6.0
+  - blast
+  - diamond
+  - cd-hit
+  - foldseek
+  - pytorch
+  - cpuonly
+  - rdkit
+  - scikit-learn
+  - numpy
